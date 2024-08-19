@@ -7,7 +7,6 @@ resource "aws_subnet" "public_subnet_1a" {
   }
 }
 
-
 resource "aws_subnet" "public_subnet_1b" {
   vpc_id            = aws_vpc.main.id
   cidr_block        = "10.0.49.0/24"
@@ -16,7 +15,6 @@ resource "aws_subnet" "public_subnet_1b" {
     Name = format("%s-public-subnet-1b", var.project_name)
   }
 }
-
 
 resource "aws_subnet" "public_subnet_1c" {
   vpc_id            = aws_vpc.main.id
@@ -34,10 +32,9 @@ resource "aws_route_table" "public_internet_access" {
   }
 }
 
-//comentar
 resource "aws_route" "public_access" {
   route_table_id         = aws_route_table.public_internet_access.id
-  destination_cidr_block = "0.0.0.0/0" //comentar 
+  destination_cidr_block = "0.0.0.0/0"
   gateway_id             = aws_internet_gateway.gw.id
 }
 

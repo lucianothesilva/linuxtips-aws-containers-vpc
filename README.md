@@ -1,6 +1,17 @@
+Aula do day 1 do curs de arquitetura de containers na AWS. Criação de uma VPC com as subnets e gateways necessarios.
+
+Diagrama do cenário criado.
+
+![image](https://github.com/user-attachments/assets/5d87281d-ed9a-4edd-95cc-41a4a4c0fdd2)
+
+
+
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| Terraform| [v1.9.5](https://releases.hashicorp.com/terraform/1.9.5/)|
+| AWS CLI| v2.17.6|
 
 ## Providers
 

@@ -1,4 +1,4 @@
-Aula do day 1 do curs de arquitetura de containers na AWS. Criação de uma VPC com as subnets e gateways necessarios.
+Aula do day 1 do curso de arquitetura de containers na AWS. Criação de uma VPC com as subnets e gateways necessarios.
 
 Diagrama do cenário criado.
 

@@ -17,7 +17,7 @@ variable "public_subnet_cidr_blocks" {
   default = ["10.0.48.0/24", "10.0.49.0/24", "10.0.50.0/24"]
 }
 
-# Cria subnets usando o count assignando letras de forma dinamica
+# Cria subnets publicas usando o count assignando letras de forma dinamica
 resource "aws_subnet" "public_subnets" {
   count             = length(var.public_subnet_cidr_blocks)
   vpc_id            = var.vpc_id

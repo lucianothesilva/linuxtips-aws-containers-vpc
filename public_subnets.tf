@@ -1,32 +1,37 @@
-resource "aws_subnet" "public_subnet_1a" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.48.0/24"
-  availability_zone = format("%sa", var.region)
-  tags = {
-    Name = format("%s-public-subnet-1a", var.project_name)
-  }
+variable "region" {
+  type = string
 }
 
-resource "aws_subnet" "public_subnet_1b" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.49.0/24"
-  availability_zone = format("%sb", var.region)
-  tags = {
-    Name = format("%s-public-subnet-1b", var.project_name)
-  }
+variable "project_name" {
+  type = string
 }
 
-resource "aws_subnet" "public_subnet_1c" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.50.0/24"
-  availability_zone = format("%sc", var.region)
+variable "vpc_id" {
+  type = string
+}
+
+
+# Mover isso daqui, lista os CIDRS
+variable "public_subnet_cidr_blocks" {
+  type    = list(string)
+  default = ["10.0.48.0/24", "10.0.49.0/24", "10.0.50.0/24"]
+}
+
+# Cria subnets usando o count assignando letras de forma dinamica
+resource "aws_subnet" "public_subnets" {
+  count             = length(var.public_subnet_cidr_blocks)
+  vpc_id            = var.vpc_id
+  cidr_block        = var.public_subnet_cidr_blocks[count.index]
+  availability_zone = format("%s%s", var.region, ["a", "b", "c"][count.index])
+  
   tags = {
-    Name = format("%s-public-subnet-1c", var.project_name)
+    Name = format("%s-public-subnet-1%s", var.project_name, ["a", "b", "c"][count.index])
   }
 }
 
 resource "aws_route_table" "public_internet_access" {
-  vpc_id = aws_vpc.main.id
+  vpc_id = var.vpc_id
+  
   tags = {
     Name = format("%s-public", var.project_name)
   }
@@ -38,17 +43,9 @@ resource "aws_route" "public_access" {
   gateway_id             = aws_internet_gateway.gw.id
 }
 
-resource "aws_route_table_association" "public_1a" {
-  subnet_id      = aws_subnet.public_subnet_1a.id
-  route_table_id = aws_route_table.public_internet_access.id
-}
-
-resource "aws_route_table_association" "public_1b" {
-  subnet_id      = aws_subnet.public_subnet_1b.id
-  route_table_id = aws_route_table.public_internet_access.id
-}
-
-resource "aws_route_table_association" "public_1c" {
-  subnet_id      = aws_subnet.public_subnet_1c.id
+# Usa o count pra criar de forma dinamica as associações de subnets publicas com a route table
+resource "aws_route_table_association" "public" {
+  count          = length(aws_subnet.public_subnets)
+  subnet_id      = aws_subnet.public_subnets[count.index].id
   route_table_id = aws_route_table.public_internet_access.id
 }

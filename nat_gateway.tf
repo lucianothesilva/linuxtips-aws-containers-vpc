@@ -1,49 +1,39 @@
-resource "aws_eip" "vpc_eip_1a" {
+variable "project_name" {
+  type = string
+}
+
+variable "availability_zones" {
+  type    = list(string)
+  default = ["a", "b", "c"]
+}
+
+variable "public_subnet_ids" {
+  type = list(string)
+}
+
+
+resource "aws_eip" "nat_eip" {
+  count  = length(var.availability_zones)
   domain = "vpc"
+  
   tags = {
-    Name = format("%s-eip-1a", var.project_name)
+    Name = format("%s-eip-1%s", var.project_name, var.availability_zones[count.index])
+  }
+}
+
+resource "aws_nat_gateway" "nat" {
+  count         = length(var.availability_zones)
+  allocation_id = aws_eip.nat_eip[count.index].id
+  subnet_id     = var.public_subnet_ids[count.index]
+  
+  tags = {
+    Name = format("%s-nat-1%s", var.project_name, var.availability_zones[count.index])
   }
 
 }
 
-resource "aws_nat_gateway" "nat_1a" {
-  allocation_id = aws_eip.vpc_eip_1a.id
-  subnet_id     = aws_subnet.public_subnet_1a.id
-  tags = {
-    Name = format("%s-nat-1a", var.project_name)
-  }
-}
 
-
-resource "aws_eip" "vpc_eip_1b" {
-  domain = "vpc"
-  tags = {
-    Name = format("%s-eip-1b", var.project_name)
-  }
-
-}
-
-resource "aws_nat_gateway" "nat_1b" {
-  allocation_id = aws_eip.vpc_eip_1b.id
-  subnet_id     = aws_subnet.public_subnet_1b.id
-  tags = {
-    Name = format("%s-nat-1b", var.project_name)
-  }
-}
-
-
-resource "aws_eip" "vpc_eip_1c" {
-  domain = "vpc"
-  tags = {
-    Name = format("%s-eip-1c", var.project_name)
-  }
-
-}
-
-resource "aws_nat_gateway" "nat_1c" {
-  allocation_id = aws_eip.vpc_eip_1c.id
-  subnet_id     = aws_subnet.public_subnet_1c.id
-  tags = {
-    Name = format("%s-nat-1c", var.project_name)
-  }
+output "nat_gateway_ids" {
+  value = aws_nat_gateway.nat[*].id
+  description = "List of NAT Gateway IDs"
 }
